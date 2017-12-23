@@ -1,2 +1,2 @@
-# earthquake-2017
+# Earthquake in 2017
 Animasi gempa bumi di Indonesia selama 2017. Sumber data : USGS
