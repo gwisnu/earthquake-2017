@@ -1,146 +1,81 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Earthquakes in 2017</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.css' rel='stylesheet' />
     <style>
-      html, body, #map {
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
     </style>
-    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
-    <!--[if lte IE 8]>
-      <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
-    <![endif]-->
-    <script type="sql/html" id="cartocss_template">
-		Map {
-		  -torque-frame-count: 256;
-		  -torque-animation-duration: 23;
-		  -torque-time-attribute: "time";
-		  -torque-aggregation-function: "count(1)";
-		  -torque-resolution: 1;
-		  -torque-data-aggregation: linear;
-		}
-		#layer {
-		  marker-width: 8;
-		  marker-fill: white;
-		  marker-fill-opacity: 0.9;
-		  marker-file: url(https://cartodb-libs.global.ssl.fastly.net/cartodbui/assets/unversioned/images/alphamarker.png);
-		  image-filters: colorize-alpha(#3288bd,#99d594,#e6f598,#fee08b,#fc8d59,#d53e4f);
-		}
-		#layer[frame-offset=1] {
-		  marker-width: 10;
-		  marker-fill-opacity: 0.44;
-		}
-		#layer[frame-offset=2] {
-		  marker-width: 12;
-		  marker-fill-opacity: 0.22;
-		}
-		#layer[frame-offset=3] {
-		  marker-width: 14;
-		  marker-fill-opacity: 0.14666666666666667;
-		}
-		#layer[frame-offset=4] {
-		  marker-width: 16;
-		  marker-fill-opacity: 0.11;
-		}
-		#layer[frame-offset=5] {
-		  marker-width: 18;
-		  marker-fill-opacity: 0.088;
-		}
-		#layer[frame-offset=6] {
-		  marker-width: 20;
-		  marker-fill-opacity: 0.07333333333333333;
-		}
-		#layer[frame-offset=7] {
-		  marker-width: 22;
-		  marker-fill-opacity: 0.06285714285714286;
-		}
-		#layer[frame-offset=8] {
-		  marker-width: 24;
-		  marker-fill-opacity: 0.055;
-		}
-		#layer[frame-offset=9] {
-		  marker-width: 26;
-		  marker-fill-opacity: 0.04888888888888889;
-		}
-		#layer[frame-offset=10] {
-		  marker-width: 28;
-		  marker-fill-opacity: 0.044;
-		}
-		#layer[frame-offset=11] {
-		  marker-width: 30;
-		  marker-fill-opacity: 0.04;
-		}
-		#layer[frame-offset=12] {
-		  marker-width: 32;
-		  marker-fill-opacity: 0.03666666666666667;
-		}
-		#layer[frame-offset=13] {
-		  marker-width: 34;
-		  marker-fill-opacity: 0.033846153846153845;
-		}
-		#layer[frame-offset=14] {
-		  marker-width: 36;
-		  marker-fill-opacity: 0.03142857142857143;
-		}
-		#layer[frame-offset=15] {
-		  marker-width: 38;
-		  marker-fill-opacity: 0.029333333333333333;
-		}
-		#layer[frame-offset=16] {
-		  marker-width: 40;
-		  marker-fill-opacity: 0.0275;
-		}
-		#layer[frame-offset=17] {
-		  marker-width: 42;
-		  marker-fill-opacity: 0.02588235294117647;
-		}
-		#layer[frame-offset=18] {
-		  marker-width: 44;
-		  marker-fill-opacity: 0.024444444444444446;
-		}
-		#layer[frame-offset=19] {
-		  marker-width: 46;
-		  marker-fill-opacity: 0.023157894736842106;
-		}
-    </script>
-  </head>
-  <body>
-    <div id="map"></div>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZ3dpc251IiwiYSI6IjEyOTU1MDA0NmJmZjEzYjMyOTQ2NGY5MjJjM2Y5YTc1In0.sd1fQhSAO1LdyQlqTc2rVw';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v9',
+    center: [115.8, -3.15],
+    zoom: 7
+});
+
+map.on('load', function() {
+    // Add a new source from our GeoJSON data and set the
+    // 'cluster' option to true. GL-JS will add the point_count property to your source data.
+    map.addSource("earthquakes", {
+        type: "geojson",
+        // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+        // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+        data: "https://raw.githubusercontent.com/gwisnu/geojson/master/marking_1170410.geojson",
+        cluster: false,
+        clusterMaxZoom: 14, // Max zoom to cluster points on
+        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+    });
+
+    map.addSource("route", {
+        type: "geojson",
+        // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+        // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+        data: "https://raw.githubusercontent.com/gwisnu/geojson/master/route_170401.geojson",
+    });
+    map.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+            "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+        "line-opacity": 0.5,
+            "line-color": "#ff0000",
+            "line-width": 4
+        }    });    
+    map.addLayer({
+        id: "unclustered-point",
+        type: "circle",
+        source: "earthquakes",
+        paint: {
+        "circle-opacity":0.6,
+            "circle-color": "#11b4da",
+            "circle-radius": 6,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#fff"
+        }
+    });
     
-    <!-- include cartodb.js library -->
-    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    
+});
 
-    <script>
-      function main() {
-        var map = new L.Map('map', {
-          zoomControl: false,
-          center: [-1.9964483, 113.534506],
-          zoom: 4
-        });
-        var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',{
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-        }).addTo(map);
 
-        cartodb.createLayer(map, {
-          type: "torque",
-          order: 1,
-          options: {
-            table_name: "earthquakes",
-            user_name: "gwisnu",
-            tile_style: $('#cartocss_template').html()
-            }
-        }).done(function(layer) {
-          map.addLayer(layer);
-        });
-      }
 
-      // you could use $(window).load(main);
-      window.onload = main;
-    </script>
-  </body>
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+</script>
+
+</body>
 </html>
